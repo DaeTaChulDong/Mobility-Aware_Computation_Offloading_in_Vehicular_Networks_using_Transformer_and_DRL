@@ -44,6 +44,7 @@ We evaluate offloading efficiency under three distinct scenarios:
 1. Run **OSM Web Wizard** (`tools/osmWebWizard.py`).
 2. Select **Manhattan, NY** (or a similar complex grid layout) to ensure high environmental complexity (intersections, heavy traffic).
 3. Generate the scenario files (`osm.net.xml`, `osm.rou.xml`).
+<img width="639" height="378" alt="02 Manhattan" src="https://github.com/user-attachments/assets/fec5a428-28b7-4df2-9b0b-c09d4a6787e1" />
 
 ### 3. Environment Test
 
@@ -105,6 +106,7 @@ Epoch [30/30], Loss: 17362.52
 >>> LSTM Training Finished.
 
 ```
+<img width="400" height="128" alt="Terminal_LSTM_predictor" src="https://github.com/user-attachments/assets/703aca3a-4ce7-439b-b5f6-0675afeca566" />
 
 **[Transformer - Proposed]**
 
@@ -117,6 +119,7 @@ Epoch [30/30], Loss: 1432.27
 >>> Transformer Training Finished.
 
 ```
+<img width="435" height="127" alt="Terminal_Transformer_predictor" src="https://github.com/user-attachments/assets/424cb54a-e88e-499b-872c-af768f80c7f8" />
 
 ### Analysis
 
@@ -184,6 +187,7 @@ To achieve robust and statistically significant results, we iteratively improved
 1. **Scenario A (Gray):** Lowest score. Without prediction, the agent aggressively attempts offloading at the edge of coverage, leading to frequent penalties (-100).
 2. **Scenario B (Blue):** Medium score. LSTM predicts reasonably well but struggles with complex turns, leading to lower precision bonuses.
 3. **Scenario C (Red):** Highest score. The Transformer accurately predicts disconnection risks and location precision, maximizing the cumulative reward.
+<img width="934" height="487" alt="스크린샷 2026-01-01 오후 10 49 45" src="https://github.com/user-attachments/assets/0ab65646-ffdf-4997-98e7-ff4d1a5135fe" />
 
 ---
 
