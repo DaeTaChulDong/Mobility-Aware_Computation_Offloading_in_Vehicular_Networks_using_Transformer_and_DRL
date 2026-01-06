@@ -184,9 +184,7 @@ To achieve robust and statistically significant results, we iteratively improved
 
 **Cumulative Reward Analysis:**
 
-1. **Scenario A (Gray):** Lowest score. Without prediction, the agent aggressively attempts offloading at the edge of coverage, leading to frequent penalties (-100).
-2. **Scenario B (Blue):** Medium score. LSTM predicts reasonably well but struggles with complex turns, leading to lower precision bonuses.
-3. **Scenario C (Red):** Highest score. The Transformer accurately predicts disconnection risks and location precision, maximizing the cumulative reward.
+We evaluated the cumulative reward over time using a Rule-Based Agent with a Precision Bonus to verify the impact of prediction quality.Scenario A (No Prediction):Trend: Rapid downward spiral.Reason: Without prediction, the agent frequently initiated tasks near the edge of communication range ($>290m$), leading to connection failures and heavy penalties (-100).Scenario B (LSTM):Trend: Moderate upward slope.Reason: While it avoided obvious failures, the higher prediction error (approx. 5~10m) resulted in lower "Precision Bonuses," limiting the total score.Scenario C (Transformer):Trend: Steepest upward slope and highest final score.Reason: The model's high precision ($<1m$ error) maximized the Precision Bonus (+50). Furthermore, the Feature Fusion mechanism allowed the agent to understand the "context" of mobility (e.g., upcoming turns), ensuring stable connections.
 <img width="1024" height="532" alt="good" src="https://github.com/user-attachments/assets/96411624-b8a0-4883-b356-d3883cb2b271" />
 
 
@@ -202,3 +200,31 @@ To achieve robust and statistically significant results, we iteratively improved
 | `train_fusion_models.py` | **(Main)** Trains models to output both predictions and feature vectors. |
 | `RL_exp.py` | Main DRL experiment script using PPO. |
 | `model_verify_performance.py` | **(Main)** Validates prediction impact on offloading using the Precision Bonus metric. |
+
+
+---
+
+📚 References & Methodology Benchmarking
+This project is built upon state-of-the-art research in vehicular edge computing. The experimental design references the following key studies:
+
+1. Baseline Methodology
+Paper: Mobility-Aware Edge Caching and Computing in Vehicle Networks: A Deep Reinforcement Learning Approach.
+
+Relevance:
+
+Used as the reference for the Baseline (Scenario B) system design.
+
+Adopted the concept of Mobility-Aware Reward Estimation to formulate the reinforcement learning environment.
+
+Provided the foundational structure for modeling vehicle-to-infrastructure (V2I) communication dynamics.
+
+2. Proposed Methodology (Benchmarked)
+Paper: MGCO: Mobility-Aware Generative Computation Offloading in Edge-Cloud Systems.
+
+Relevance:
+
+Served as the core benchmark for the Proposed (Scenario C) architecture.
+
+Generative Offloading / Feature Fusion: We implemented the paper's "Seq2Seq" concept by feeding the Transformer's Latent Feature Vector (Hidden State) directly into the PPO agent's state space, rather than just passing coordinate values.
+
+Long-term Prediction: Following this study, we extended the prediction horizon to capture global context using the Transformer's Multi-Head Attention mechanism.
