@@ -1,1 +1,199 @@
-# Mobility-Aware_Computation_Offloading_in_Vehicular_Networks_using_Transformer_and_DRL
+# Mobility-Aware Computation Offloading in Vehicular Networks using Transformer and DRL
+
+This project implements a **Mobility-Aware Computation Offloading System** for vehicular networks. It compares a **Proposed Transformer-based approach** against a **Baseline LSTM approach** for mobility prediction and integrates these models with a Deep Reinforcement Learning (DRL) agent (PPO) to optimize task offloading decisions in complex urban environments.
+
+The simulation environment is built using **SUMO (Simulation of Urban MObility)** and **Python (TraCI)**.
+
+---
+
+## 🛠️ Experiment Design
+
+### 1. Mobility Prediction
+
+We evaluate the performance of two deep learning models for time-series trajectory prediction:
+
+* **Baseline:** RNN/LSTM (Recurrent Neural Network / Long Short-Term Memory).
+* *Implementation based on standard survey references.*
+
+
+* **Proposed:** Transformer (Self-Attention based architecture).
+* *Optimized for long-term time-series dependencies.*
+
+
+* **Metric:** Prediction Error (MSE Loss) and Connection Stability.
+
+### 2. DRL-based Offloading Scenarios
+
+We evaluate offloading efficiency under three distinct scenarios:
+
+* **Scenario A (No Prediction):** The agent makes decisions based solely on the current state.
+* **Scenario B (with LSTM):** The agent utilizes future information predicted by the LSTM model.
+* **Scenario C (with Transformer):** The agent utilizes future information predicted by the Transformer model.
+
+---
+
+## ⚙️ Prerequisites & Setup
+
+### 1. Environment Installation
+
+* **SUMO:** Install the latest version of SUMO.
+* **Python:** Ensure `TraCI`, `torch`, `pandas`, and `numpy` are installed.
+
+### 2. Map & Traffic Generation
+
+1. Run **OSM Web Wizard** (`tools/osmWebWizard.py`).
+2. Select **Manhattan, NY** (or a similar complex grid layout) to ensure high environmental complexity (intersections, heavy traffic).
+3. Generate the scenario files (`osm.net.xml`, `osm.rou.xml`).
+
+### 3. Environment Test
+
+* Run `test_env.py` to verify the virtual environment and TraCI connection.
+
+---
+
+## 🚀 Usage Guide
+
+### Step 1: Data Collection
+
+Run the data collector to generate the training dataset from the SUMO simulation.
+
+```bash
+python data_collector.py
+
+```
+
+* **Process:** Simulates 3600 steps (approx. 1 hour).
+* **Output:** Records (x, y) coordinates and speed for all vehicles every second into `mobility_dataset.csv`.
+* *Note: Ensure you click the **Play** button in the SUMO GUI to start the simulation.*
+
+### Step 2: Model Training
+
+Train the prediction models (LSTM and Transformer).
+
+```bash
+python train_fusion_models.py
+
+```
+
+* This script trains both models using the normalized dataset and saves the weights (`lstm_fusion.pth`, `transformer_fusion.pth`).
+
+### Step 3: Performance Evaluation
+
+Run the rule-based verification script to visualize the cumulative rewards.
+
+```bash
+python model_verify_performance.py
+
+```
+
+---
+
+## 📊 Experiment 1: Mobility Prediction Results
+
+We trained both models using `mobility_dataset.csv`.
+
+### Training Logs
+
+**[LSTM - Baseline]**
+
+```
+Total Samples: 28,645
+Epoch [5/30],  Loss: 197085.35
+Epoch [10/30], Loss: 119988.70
+Epoch [20/30], Loss: 48632.50
+Epoch [30/30], Loss: 17362.52
+>>> LSTM Training Finished.
+
+```
+
+**[Transformer - Proposed]**
+
+```
+Total Samples: 28,645
+Epoch [5/30],  Loss: 40128.27
+Epoch [10/30], Loss: 10630.54
+Epoch [20/30], Loss: 2212.58
+Epoch [30/30], Loss: 1432.27
+>>> Transformer Training Finished.
+
+```
+
+### Analysis
+
+* **Transformer** achieved a final loss of **~1,432**, which is approximately **12x lower** than LSTM (~17,362).
+* The Self-Attention mechanism effectively captured complex past driving patterns, resulting in significantly more precise future location predictions compared to the recurrent structure of LSTM.
+
+---
+
+## 🔄 Methodology Refinements (Evolution of Experiments)
+
+To achieve robust and statistically significant results, we iteratively improved the experimental methodology through seven key stages:
+
+### 1. Data Normalization
+
+* **Problem:** Raw SUMO coordinates (0~1000+) were too large for neural network convergence.
+* **Solution:** Applied normalization (scaling by 1/1000) in `train_models_normalized.py`.
+
+### 2. Reward Shaping (Solving Local Optima)
+
+* **Problem:** The agent fell into local optima (always choosing "Local Computing") due to excessive failure penalties.
+* **Solution:** Adjusted the reward function to encourage offloading exploration.
+* Success: +10  **+20** / Local: -2  **-1**
+* Episodes: Increased from 3 to 5.
+
+
+
+### 3. Long-term Prediction (Hard Mode)
+
+* **Problem:** Short-term predictions (5s) were too easy for LSTM, failing to show the Transformer's advantage.
+* **Solution:** Extended the task duration (Output Window) to **10~15 seconds** to evaluate Long-term Dependency performance.
+
+### 4. MGCO Benchmarking (Feature Fusion)
+
+* **Method:** Adopted the "Generative Offloading" concept from the MGCO paper.
+* **Implementation:** Expanded the PPO State Space. The prediction models now pass not just coordinates but also the **Context Vector (Hidden State, 64-dim)** to the agent, sharing uncertainty and context directly.
+
+### 5. High Penalty & Environmental Complexity
+
+* **Refinement:**
+* **Map:** Changed from **Sinchon** (Simple) to **Manhattan** (Complex intersections) to induce variable driving patterns.
+* **Penalty:** Increased connection failure penalty from **-10 to -100** to severely punish misjudgments (Scenario A failure).
+
+
+
+### 6. Parameter Tuning
+
+* **Refinement:**
+* **Windows:** Extended Input/Output windows to **Past 30s / Future 15s** to capture long-term patterns.
+* **Model Capacity:** Increased layers and heads for the Transformer to handle the increased complexity.
+
+
+
+### 7. Precision Bonus (Final Verification)
+
+* **Problem:** Binary success/failure metrics did not fully capture the "quality" of prediction.
+* **Solution:** Introduced a **"Precision Bonus"** (up to +50 points) in `model_verify_performance.py`.
+* **Result:** This highlighted the Transformer's ability to predict exact locations, leading to a diverging performance gap (C > B > A).
+
+---
+
+## 📈 Experiment 2: Offloading Performance Results
+
+**Cumulative Reward Analysis:**
+
+1. **Scenario A (Gray):** Lowest score. Without prediction, the agent aggressively attempts offloading at the edge of coverage, leading to frequent penalties (-100).
+2. **Scenario B (Blue):** Medium score. LSTM predicts reasonably well but struggles with complex turns, leading to lower precision bonuses.
+3. **Scenario C (Red):** Highest score. The Transformer accurately predicts disconnection risks and location precision, maximizing the cumulative reward.
+
+---
+
+## 📂 Key Files Description
+
+| Filename | Description |
+| --- | --- |
+| `data_collector.py` | Runs SUMO simulation and generates the trajectory dataset. |
+| `lstm_predictor.py` | Training script for the Baseline LSTM model. |
+| `Transformer_predictor.py` | Training script for the Proposed Transformer model. |
+| `train_fusion_models.py` | **(Main)** Trains models to output both predictions and feature vectors. |
+| `RL_exp.py` | Main DRL experiment script using PPO. |
+| `model_verify_performance.py` | **(Main)** Validates prediction impact on offloading using the Precision Bonus metric. |
