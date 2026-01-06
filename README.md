@@ -187,7 +187,8 @@ To achieve robust and statistically significant results, we iteratively improved
 1. **Scenario A (Gray):** Lowest score. Without prediction, the agent aggressively attempts offloading at the edge of coverage, leading to frequent penalties (-100).
 2. **Scenario B (Blue):** Medium score. LSTM predicts reasonably well but struggles with complex turns, leading to lower precision bonuses.
 3. **Scenario C (Red):** Highest score. The Transformer accurately predicts disconnection risks and location precision, maximizing the cumulative reward.
-<img width="934" height="487" alt="스크린샷 2026-01-01 오후 10 49 45" src="https://github.com/user-attachments/assets/0ab65646-ffdf-4997-98e7-ff4d1a5135fe" />
+<img width="1024" height="532" alt="good" src="https://github.com/user-attachments/assets/96411624-b8a0-4883-b356-d3883cb2b271" />
+
 
 ---
 
