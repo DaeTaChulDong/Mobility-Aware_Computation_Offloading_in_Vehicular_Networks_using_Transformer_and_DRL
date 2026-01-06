@@ -182,9 +182,24 @@ To achieve robust and statistically significant results, we iteratively improved
 
 ## 📈 Experiment 2: Offloading Performance Results
 
-**Cumulative Reward Analysis:**
+### 📊 Cumulative Reward Analysis
 
-We evaluated the cumulative reward over time using a Rule-Based Agent with a Precision Bonus to verify the impact of prediction quality.Scenario A (No Prediction):Trend: Rapid downward spiral.Reason: Without prediction, the agent frequently initiated tasks near the edge of communication range ($>290m$), leading to connection failures and heavy penalties (-100).Scenario B (LSTM):Trend: Moderate upward slope.Reason: While it avoided obvious failures, the higher prediction error (approx. 5~10m) resulted in lower "Precision Bonuses," limiting the total score.Scenario C (Transformer):Trend: Steepest upward slope and highest final score.Reason: The model's high precision ($<1m$ error) maximized the Precision Bonus (+50). Furthermore, the Feature Fusion mechanism allowed the agent to understand the "context" of mobility (e.g., upcoming turns), ensuring stable connections.
+We evaluated the cumulative reward over time using a **Rule-Based Agent with a Precision Bonus** to quantify the impact of prediction quality on service reliability.
+
+* **🔘 Scenario A (No Prediction)**
+* **Trend:** 📉 **Rapid downward spiral.**
+* **Reason:** Without prediction, the agent frequently initiated tasks near the edge of the communication range (>290m). This led to frequent connection failures and heavy penalties (-100).
+
+
+* **🔵 Scenario B (LSTM - Baseline)**
+* **Trend:** ↗️ **Moderate upward slope.**
+* **Reason:** While the model successfully avoided obvious failures, its higher prediction error (approx. 5~10m) resulted in lower "Precision Bonuses," limiting the total score accumulation.
+
+
+* **🔴 Scenario C (Transformer - Proposed)**
+* **Trend:** 🚀 **Steepest upward slope and highest final score.**
+* **Reason:** The model's high precision (<1m error) maximized the **Precision Bonus (+50)**. Furthermore, the **Feature Fusion** mechanism allowed the agent to understand the "context" of mobility (e.g., upcoming turns), ensuring stable connections even in complex environments.
+
 <img width="1024" height="532" alt="good" src="https://github.com/user-attachments/assets/96411624-b8a0-4883-b356-d3883cb2b271" />
 
 
@@ -204,27 +219,26 @@ We evaluated the cumulative reward over time using a Rule-Based Agent with a Pre
 
 ---
 
-📚 References & Methodology Benchmarking
-This project is built upon state-of-the-art research in vehicular edge computing. The experimental design references the following key studies:
+## 📚 References & Methodology Benchmarking
 
-1. Baseline Methodology
-Paper: Mobility-Aware Edge Caching and Computing in Vehicle Networks: A Deep Reinforcement Learning Approach.
+This project builds upon state-of-the-art research in vehicular edge computing. The experimental design explicitly benchmarks the following key studies:
 
-Relevance:
+### 1. Baseline Methodology
 
-Used as the reference for the Baseline (Scenario B) system design.
+> **L. T. Tan and R. Q. Hu**, "Mobility-Aware Edge Caching and Computing in Vehicle Networks: A Deep Reinforcement Learning Approach," *IEEE Transactions on Vehicular Technology*, 2018.
 
-Adopted the concept of Mobility-Aware Reward Estimation to formulate the reinforcement learning environment.
+**Relevance:**
 
-Provided the foundational structure for modeling vehicle-to-infrastructure (V2I) communication dynamics.
+* **System Design:** Used as the reference for the **Baseline (Scenario B)** architecture.
+* **Reward Function:** Adopted the concept of *Mobility-Aware Reward Estimation* to formulate the reinforcement learning environment.
+* **Dynamics:** Provided the foundational structure for modeling Vehicle-to-Infrastructure (V2I) communication dynamics.
 
-2. Proposed Methodology (Benchmarked)
-Paper: MGCO: Mobility-Aware Generative Computation Offloading in Edge-Cloud Systems.
+### 2. Proposed Methodology (Benchmarked)
 
-Relevance:
+> **A. Ghosh et al.**, "MGCO: Mobility-Aware Generative Computation Offloading in Edge-Cloud Systems," *IEEE Transactions on Services Computing*, 2025.
 
-Served as the core benchmark for the Proposed (Scenario C) architecture.
+**Relevance:**
 
-Generative Offloading / Feature Fusion: We implemented the paper's "Seq2Seq" concept by feeding the Transformer's Latent Feature Vector (Hidden State) directly into the PPO agent's state space, rather than just passing coordinate values.
-
-Long-term Prediction: Following this study, we extended the prediction horizon to capture global context using the Transformer's Multi-Head Attention mechanism.
+* **Core Benchmark:** Served as the primary reference for the **Proposed (Scenario C)** architecture.
+* **Generative Offloading / Feature Fusion:** We implemented the paper's "Seq2Seq" concept by feeding the Transformer's **Latent Feature Vector (Hidden State)** directly into the PPO agent's state space, rather than just passing raw coordinate values.
+* **Long-term Prediction:** Following this study, we extended the prediction horizon to capture global context using the Transformer's **Multi-Head Attention** mechanism.
